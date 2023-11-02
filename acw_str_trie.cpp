@@ -61,6 +61,7 @@
 
 
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -77,8 +78,23 @@ void Insert(int x)
         if(!son[p][u]) son[p][u] = ++index;
         p = son[p][u];
     }
+}
 
+int query(int x)
+{
+    int p = 0, res = 0;
+    for(int i = 30; i >= 0; i--)
+    {
+        int u = x >> i & 1;
+        if(son[p][!u])
+        {
+            res += 1 << i;
+            p = son[p][u];
+        }
+        else p = son[p][u];
+    }
 
+    return res;
 }
 
 int main()
@@ -86,5 +102,14 @@ int main()
     cin >> n;
     for(int i = 0; i < n ;i ++) cin >> a[i];
 
-    for(int i = 0; i < n; i++) Insert(a[i]);
+    int res = 0;
+    for(int i = 0; i < n; i++) 
+    {
+        Insert(a[i]);
+        res = max(res, query(a[i]));
+    }
+
+    cout << res << endl;
+
+    return 0;
 }
