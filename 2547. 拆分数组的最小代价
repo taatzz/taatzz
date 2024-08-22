@@ -1,0 +1,32 @@
+class Solution {
+public:
+    int minCost(vector<int>& nums, int k) {
+        int n = nums.size();
+
+        int mem[n + 1];
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int i)->int
+        {
+            if(i < 0) return 0;
+
+            if(mem[i] != -1) return mem[i];
+            vector<int> cnt(1001), st(1001);
+
+            int res = INT_MAX, sum = 0;
+            for(int j = i; j >= 0; j--)
+            {
+                int x = nums[j];
+                cnt[x]++;
+                if(cnt[x] == 1) sum++;
+                else if(!st[x]) st[x] = 1, sum--;
+
+                res = min(res, dfs(dfs, j - 1) + i - j + 1 - sum + k);
+            }
+
+            return mem[i] = res;
+        };
+
+        return dfs(dfs, n - 1);
+    }
+};
