@@ -1,0 +1,34 @@
+class Solution {
+public:
+    int minSpaceWastedKResizing(vector<int>& nums, int k) {
+        int n = nums.size(), inf = INT_MAX / 2;
+        int mem[n + 1][k + 1];
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int i, int k)->int
+        {
+            if(k < 0) return inf;
+            if(i < 0) return 0;
+            if(k == 0)
+            {
+                int sum = 0, mx = INT_MIN;
+                for(int j = 0; j <= i; j++) sum += nums[j], mx = max(nums[j], mx);
+
+                return mx * (i + 1) - sum;
+            }
+            if(mem[i][k] != -1) return mem[i][k];
+
+            int res = inf, sum = 0, mx = 0;
+            for(int j = i; j >= 0; j--)
+            {
+                sum += nums[j];
+                mx = max(mx, nums[j]);
+                res = min(res, dfs(dfs, j - 1, k - 1) + (i - j + 1) * mx - sum);
+            }
+
+            return mem[i][k] = res;
+        };
+
+        return dfs(dfs, n - 1, k);
+    }
+};
