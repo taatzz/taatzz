@@ -1,0 +1,32 @@
+class Solution {
+public:
+    long long minimumTotalDistance(vector<int>& nums, vector<vector<int>>& arr) {
+        int n = nums.size(), m = arr.size();
+        long long inf = 1e18;
+        sort(nums.begin(), nums.end());
+        sort(arr.begin(), arr.end(), [](auto& a, auto& b) { return a[0] < b[0]; });
+
+        long long mem[n + 1][m + 1];
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int i, int k)->long long
+        {
+            if(i < 0) return 0;
+            if(k < 0) return inf;
+            if(mem[i][k] != -1) return mem[i][k];
+
+            long long res = inf, sum = 0;
+            res = min(res, dfs(dfs, i, k - 1));
+            
+            for(int j = i; j >= 0 && i - j + 1 <= arr[k][1]; j--)
+            {
+                sum += abs(nums[j] - arr[k][0]);
+                res = min(res, (long long)dfs(dfs, j - 1, k - 1) + sum);
+            }
+
+            return mem[i][k] = res;
+        };
+
+        return dfs(dfs, n - 1, m - 1);
+    }
+};
