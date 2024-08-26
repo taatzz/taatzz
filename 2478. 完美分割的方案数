@@ -1,0 +1,27 @@
+class Solution {
+public:
+    int beautifulPartitions(string s, int t, int len) {
+        int n = s.size(), mod = 1e9 + 7;
+        unordered_set<int> h = { '2', '3', '5', '7' };
+
+        int mem[n][t];
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int i, int k)->int
+        {
+            if(k == 0) return !h.count(s[i]) && h.count(s[0]);
+            if(mem[i][k] != -1) return mem[i][k];
+
+            int res = 0;
+            for(int j = i - len + 1; j >= 0 && j >= len * k; j--)
+            {
+                if(j - 1 >= 0 && h.count(s[j]) && !h.count(s[j - 1]))
+                    res = (res + dfs(dfs, j - 1, k - 1)) % mod;
+            }
+
+            return mem[i][k] = res;
+        };
+
+        return dfs(dfs, n - 1, t - 1);
+    }
+};
