@@ -1,0 +1,30 @@
+class Solution {
+public:
+    long long minDamage(int k, vector<int>& nums, vector<int>& health) {
+        typedef long long ll;
+        typedef pair<int, int> pii;
+
+        vector<pii> t;
+        int n = nums.size();
+        for(int i = 0; i < n; i++)
+        {
+            t.push_back({nums[i], health[i]});
+        }
+
+        ll sum = accumulate(nums.begin(), nums.end(), 0ll);
+        sort(t.begin(), t.end(), [&](pii& a, pii& b){
+            int tx = (a.second + k - 1) / k, ty = (b.second + k - 1) / k;
+            return 1ll * b.first * tx < 1ll * a.first * ty;
+        });
+
+        ll res = 0;
+        for(int i = 0; i < n; i++)
+        {
+            ll x = (t[i].second + k - 1) / k;
+            res += 1ll * sum * x;
+            sum -= t[i].first;
+        }
+
+        return res;
+    }
+};
