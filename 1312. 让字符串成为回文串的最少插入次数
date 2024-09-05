@@ -1,0 +1,24 @@
+class Solution {
+public:
+    int minInsertions(string s) {
+        int n = s.size(), inf = INT_MAX / 2;
+
+        int mem[n][n];
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int i, int j)
+        {
+            if(i >= j) return 0;
+            if(mem[i][j] != -1) return mem[i][j];
+
+            int res = inf;
+
+            if(s[i] == s[j]) return dfs(dfs, i + 1, j - 1);
+            else res = min(dfs(dfs, i, j - 1), dfs(dfs, i + 1, j)) + 1;
+
+            return mem[i][j] = res;
+        };
+
+        return dfs(dfs, 0, n - 1);
+    }
+};
