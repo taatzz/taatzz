@@ -1,0 +1,24 @@
+class Solution {
+public:
+    int getMoneyAmount(int n) {
+        int mem[n + 1][n + 1];
+        int inf = INT_MAX / 2;
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int i, int j)
+        {
+            if(i >= j) return 0;
+            if(mem[i][j] != -1) return mem[i][j];
+
+            int res = inf;
+            for(int k = i; k <= j; k++)
+            {
+                res = min(res, max(dfs(dfs, i, k - 1), dfs(dfs, k + 1, j)) + k);
+            }
+
+            return mem[i][j] = res;
+        };
+
+        return dfs(dfs, 0, n);
+    }
+};
