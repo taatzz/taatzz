@@ -1,0 +1,24 @@
+class Solution {
+public:
+    int maximumScore(vector<int>& nums, vector<int>& mul) {
+        int n = nums.size();
+        map<array<int, 3>, int> mem;
+
+        auto dfs = [&](auto&& dfs, int i, int j, int k)->int
+        {
+            if(k == mul.size()) return 0;
+            if(i > j) return 0;
+            if(i == j) return nums[i] * mul[k];
+            array<int, 3> t = {i, j, k};
+            if(mem.count(t)) return mem[t];
+
+            int res = INT_MIN;
+            res = max(res, dfs(dfs, i + 1, j, k + 1) + nums[i] * mul[k]);
+            res = max(res, dfs(dfs, i, j - 1, k + 1) + nums[j] * mul[k]);
+
+            return mem[t] = res;
+        };
+
+        return dfs(dfs, 0, n - 1, 0);
+    }
+};
