@@ -1,0 +1,55 @@
+class Solution {
+public:
+    int son[10010][26], idx = 0, cnt[10010];
+
+    vector<string> wordBreak(string s, vector<string>& words) {
+
+        auto insert = [&](string& s)
+        {
+            int p = 0;
+            for(int i = 0; i < s.size(); i++)
+            {
+                int u = s[i] - 'a';
+                if(!son[p][u]) son[p][u] = ++idx;
+                p = son[p][u];
+            }
+            cnt[p]++;
+        };
+
+        for(auto& e : words)
+        {
+            insert(e);
+        }
+        vector<string> res;
+
+        auto dfs = [&](auto&& dfs, int i)
+        {
+            if(i >= s.size()) 
+            {
+                res.push_back(s);
+                return;
+            }
+
+            int p = 0;
+            for(int j = i; j < s.size(); j++)
+            {
+                int u = s[j] - 'a';
+                if(!son[p][u]) break;
+                p = son[p][u];
+                if(cnt[p]) 
+                {
+                    s.insert(j + 1, " ");
+                    dfs(dfs, j + 2);
+                    s.erase(j + 1, 1);    
+                }
+            }
+
+            return;
+        };
+
+        dfs(dfs, 0);
+        for(auto& e : res) e.pop_back();
+
+        return res;
+    }
+};
