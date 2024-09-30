@@ -1,0 +1,39 @@
+class Solution {
+public:
+    int maximumANDSum(vector<int>& nums, int k) {
+        int n = nums.size(), inf = INT_MIN / 2;
+        int mem[k][1 << n];
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int i, int mask)
+        {
+            int t = (1 << n) - 1;
+            if(i >= k)
+            {
+                return 0;
+            }
+            if(mem[i][mask] != -1) return mem[i][mask];
+
+            int res = inf, p = __builtin_popcount(mask);
+            if(2 * (k - i - 1) >= n - p) res = dfs(dfs, i + 1, mask);
+
+            for(int l = 0; l < n; l++)
+            {
+                if(mask >> l & 1) continue;
+                int c = nums[l] & (1 + i);
+                if(2 * (k - i - 1) >= n - p - 1)
+                    res = max(res, dfs(dfs, i + 1, 1 << l | mask) + c);
+                for(int r = 0; r < n; r++)
+                {
+                    if((mask >> r & 1) || (l == r)) continue;
+                    int a = 1 << l, b = 1 << r, s = (nums[l] & (i + 1)) + (nums[r] & (i + 1));
+                    res = max(res, dfs(dfs, i + 1, mask | a | b) + s);
+                }
+            }
+
+            return mem[i][mask] = res;
+        };
+
+        return dfs(dfs, 0, 0);
+    }
+};
