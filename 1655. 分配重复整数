@@ -1,0 +1,48 @@
+class Solution {
+public:
+    bool canDistribute(vector<int>& nums, vector<int>& arr) {
+        int n = nums.size(), m = arr.size();
+        vector<int> s(1 << m);
+        for(int mask = 0; mask < (1 << m); mask++)
+        {
+            int sum = 0;
+            for(int i = 0; i < m; i++)
+            {
+                if(mask >> i & 1) sum += arr[i];
+            }
+            s[mask] = sum;
+        }
+
+        unordered_map<int, int> cnt;
+        for(int i = 0; i < n; i++) cnt[nums[i]]++;     
+
+        int mem[cnt.size()][1 << (m + 1)];
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int a, int mask)
+        {
+            if(a == cnt.size()) return mask == 0 ? 1 : 0;
+            if(mask == 0) return 1;
+            if(mem[a][mask] != -1) return mem[a][mask];
+
+            int res = 0;
+            for(int i = mask; i; i = (i - 1) & mask)   
+            {
+                int sum = s[i];
+                for(auto& [k, e] : cnt)
+                {
+                    if(e >= sum) 
+                    {
+                        e -= sum;
+                        res |= dfs(dfs, a + 1, mask ^ i);
+                        e += sum;
+                    }
+                }
+            }
+
+            return mem[a][mask] = res;
+        };
+
+        return dfs(dfs, 0, (1 << m) - 1);
+    }
+};
