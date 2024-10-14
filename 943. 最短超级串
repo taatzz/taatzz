@@ -1,0 +1,57 @@
+class Solution {
+public:
+    string shortestSuperstring(vector<string>& words) {
+        int n = words.size();
+
+        auto find = [&](string& a, string& b)
+        {
+            int j = a.size() - 1, res = 0;
+            for(int i = 0; i <= j; i++)
+            {
+                if(b.size() >= j - i + 1)
+                {
+                    if(a.substr(i) == b.substr(0, j - i + 1)) return j - i + 1;
+                }
+            }
+
+            return res;
+        };
+
+        vector<vector<int>> t(n, vector<int>(n, 0));
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = 0; j < n; j++)
+            {
+                if(j == i) continue;
+                t[i][j] = find(words[i], words[j]);
+            }
+        }
+
+        vector<vector<string>> mem(1 << n, vector<string>(n, ""));
+    
+        auto dfs = [&](auto&& dfs, int mask, int pre)->string
+        {
+            if(mask == (1 << n) - 1) return "";
+            if(pre != -1 && mem[mask][pre].size() != 0) return mem[mask][pre];
+
+            string res, x;
+            for(int i = 0; i < n; i++)
+            {
+                if(mask >> i & 1) continue;
+                int c = 0;
+                if(pre != -1) c = t[pre][i];
+                
+                x = dfs(dfs, 1 << i | mask, i);
+
+                string s = words[i].substr(c);
+                s += x;
+                if(res.size() == 0 || res.size() > s.size()) res = s;
+            }
+
+            if(pre != -1) mem[mask][pre] = res;
+            return res;
+        };
+
+        return dfs(dfs, 0, -1);
+    }
+};
