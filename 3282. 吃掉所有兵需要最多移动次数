@@ -1,0 +1,80 @@
+class Solution {
+public:
+    int dx[8] = { 2,1,-1,-2,-2,-1,1,2 };
+    int dy[8] = { 1,2,2,1,-1,-2,-2,-1 };
+
+    int maxMoves(int kx, int ky, vector<vector<int>>& nums) {
+        typedef pair<int, int> pii;
+        nums.push_back({kx, ky});
+        int n = nums.size();
+        vector<vector<int>> h(n + 1, vector<int>(n + 1, 0));
+
+        auto bfs = [&](int x)
+        {
+            map<pii, int> st;
+            for(int i = 0; i < n; i++) st[{nums[i][0], nums[i][1]}] = i;
+            queue<pii> q;
+            int s_x = nums[x][0], s_y = nums[x][1];
+            q.push({s_x, s_y});
+            vector<vector<int>> d(55, vector<int>(55, 0));
+            d[s_x][s_y] = 0;
+
+            while(q.size())
+            {
+                int n = q.size();
+                
+                auto t = q.front();
+                q.pop();
+                for(int j = 0; j < 8; j++)
+                {
+                    int a = t.first + dx[j], b = t.second + dy[j];
+                    if(a >= 0 && a <= 49 and b >= 0 and b <= 49 && !d[a][b])
+                    {
+                        q.push({a, b});
+                        d[a][b] = d[t.first][t.second] + 1;
+                        if(st.count({a, b})) 
+                        {
+                            h[x][st[{a, b}]] = d[a][b];
+                        }
+                    }
+                }
+            }
+        };
+
+        
+        for(int i = 0; i < n; i++)
+        {
+            bfs(i);
+        }
+
+        int mem[1 << (n - 1)][n];
+        memset(mem, -1, sizeof mem);
+
+        auto dfs = [&](auto&& dfs, int mask, int pre)
+        {
+            if(mask == (1 << (n - 1)) - 1) return 0;
+            int m = __builtin_popcount(mask);
+
+            if(pre != -1 and mem[mask][pre] != -1) return mem[mask][pre];
+            int res = m % 2 == 0 ? -1e9 : 1e9;
+
+            for(int i = 0; i < n - 1; i++)
+            {
+                if(mask >> i & 1) continue;     
+                int c = 0;
+
+                if(pre == -1) c = h[n - 1][i];
+                else c = h[pre][i];
+                int x = dfs(dfs, 1 << i | mask, i) + c;
+
+                if(m % 2 == 0) res = max(res, x);
+                else res = min(res, x);
+            }
+
+            if(pre != -1) mem[mask][pre] = res;
+            return res;
+        };
+
+        return dfs(dfs, 0, -1);
+    }
+};
