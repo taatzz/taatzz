@@ -1,0 +1,36 @@
+class Solution {
+public:
+    int countGoodNodes(vector<vector<int>>& edges) {
+        int n = edges.size();
+        vector<vector<int>> edge(n + 1);
+
+        for(auto& e : edges)
+        {
+            edge[e[0]].push_back(e[1]);
+            edge[e[1]].push_back(e[0]);
+        }
+
+        int res = 0;
+        vector<int> t(n + 1);
+
+        auto dfs = [&](auto&& dfs, int u)->int
+        {
+            t[u] = 1;
+            int pre = -1, sum = 1, st = 1;
+            for(int v : edge[u])
+            {
+                if(t[v]) continue;
+                int x = dfs(dfs, v);
+                if(pre != -1 && x != pre) st = 0;
+                pre = x;
+                sum += x;
+            }
+            if(st) res++;
+
+            return sum;
+        };
+
+        dfs(dfs, 0);
+        return res;
+    }
+};
