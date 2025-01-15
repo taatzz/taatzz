@@ -1,0 +1,60 @@
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+#include <climits>
+
+// 前后缀分解
+void solve()
+{
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<char> a(m);
+    for(int i = 0; i < m; i++) std::cin >> a[i];
+
+    std::unordered_set<char> h;
+    for(int i = 0; i < m; i++) h.insert(a[i]);
+
+    std::string s;
+    std::cin >> s;
+
+    typedef std::pair<int, char> pic;
+    std::vector<pic> suf(n);
+    int pre = INT_MAX;
+    char c = 'A';
+    for(int i = n - 1; i>= 0; i--)
+    {
+        if(!h.count(s[i]))
+        {
+            suf[i].first = pre;
+            suf[i].second = c;
+        }
+        else pre = i, c = s[i];
+    }
+
+    pre = INT_MIN / 2, c = 'A';
+    for(int i = 0; i < n; i++)
+    {
+        if(!h.count(s[i]))
+        {
+            if(i - pre <= suf[i].first - i)
+            {
+                s[i] = c;
+            }
+            else s[i] = suf[i].second;
+        }
+        else pre = i, c = s[i];
+    }
+
+    std::cout << s << std::endl;
+}
+
+int main()
+{
+
+    int r = 1;
+    // std::cin >> r;
+
+    while(r--) solve();
+
+    return 0;
+}
